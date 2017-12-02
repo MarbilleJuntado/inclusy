@@ -1,13 +1,13 @@
 {
-  "name": "billbot",
+  "name": "inclusy",
   "version": "1.0.0",
-  "description": "BillBot Server",
+  "description": "Inclusy Server",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" &amp;&amp; exit 1",
     "start": "node app.js"
   },
-  "author": "Marbille Juntado",
+  "author": "FreeCodeCamp",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
