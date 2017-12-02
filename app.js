@@ -96,6 +96,7 @@ function processMessage(event) {
         var message = event.message;
         var senderId = event.sender.id;
 
+
         console.log("Received message from senderId: " + senderId);
         console.log("Message is: " + JSON.stringify(message));
 
@@ -105,20 +106,20 @@ function processMessage(event) {
 
             while (formattedMsg !== 'exit') {
                 if (formattedMsg.includes('loan') || formattedMsg.includes('mortgage') || formattedMsg.includes('borrow') || formattedMsg.includes('business') || formattedMsg.includes('peso')) {
-                    sendMessage(userId, {text: "May I clarify that you're asking for a loan? Please reply 'Yes' or 'No"});
+                    sendMessage(senderId, {text: "May I clarify that you're asking for a loan? Please reply 'Yes' or 'No"});
                     if (formattedMsg.includes('yes')) {
-                        sendMessage(userId, {text: "May I ask how much?"});
+                        sendMessage(senderId, {text: "May I ask how much?"});
                     } else if (formattedMsg.includes('no')) {
-                        sendMessage(userId, {text: "Is there anything else I can help you with?"});
+                        sendMessage(senderId, {text: "Is there anything else I can help you with?"});
                         if (formattedMsg.includes('no')) {
-                            sendMessage(userId, {text: "Thank you and have a nice day."});
+                            sendMessage(senderId, {text: "Thank you and have a nice day."});
                         }
                     } else {
-                        sendMessage(userId, {text: "I'm sorry, but I can only assist you with loan-related matters."});
+                        sendMessage(senderId, {text: "I'm sorry, but I can only assist you with loan-related matters."});
                         break;
                     }
                 } else {
-                    sendMessage(userId, {text: "I'm sorry, but I can only assist you with loan-related matters."});
+                    sendMessage(senderId, {text: "I'm sorry, but I can only assist you with loan-related matters."});
                     break;
                 }
             }
