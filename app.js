@@ -1,53 +1,58 @@
-var express = require("express");
-var request = require("request");
-var bodyParser = require("body-parser");
+const express = require('express');
+const request = require('request');
+const bodyParser = require('body-parser');
 
-var app = express();
+const app = express();
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
 
-const User = require('./classes/User/User')
-var steps = [];
+const User = require('./classes/User/User');
+
+let steps = [];
 
 // Server index page
-app.get("/", function (req, res) {
+app.get('/', (req, res) => {
   res.send("Deployed!");
 });
 
 app.post("/user_info", function (req, res) {
-  console.log('test')
+  console.log('test');
+
   if (!req.body.id) {
     res.send("User needs an id");
   }
   else {
     const user = new User(id);
+
     res.sendStatus(user)
   }
-
 });
 
 // Facebook Webhook
 // used for verification
-app.get("/webhook", function (req, res) {
-  if (req.query["hub.verify_token"] === "this_is_my_token") {
+app.get('/webhook', (req, res) => {
+  if (req.query['hub.verify_token'] === 'this_is_my_token') {
       console.log("Verified webhook");
-      res.status(200).send(req.query["hub.challenge"]);
+
+      res.status(200).send(req.query['hub.challenge']);
   } else {
       console.error("Verification failed. The tokens do not match");
+
       res.sendStatus(403);
   }
 });
 
 // All callbacks for Messenger will be POST-ed here
-app.post("/webhook", function (req, res) {
+app.post('/webhook', (req, res) => {
   // Make sure this is a page subscription
-  if (req.body.object == "page") {
+  if (req.body.object === 'page') {
     // Iterate over each entry
     // There may be multiple entries if batched
-    req.body.entry.forEach(function(entry) {
+    req.body.entry.forEach(entry => {
       // Iterate over each messaging event
-      entry.messaging.forEach(function(event) {
+      entry.messaging.forEach(event => {
         if (event.postback) {
           processPostback(event);
         } else if (event.message) {
@@ -61,30 +66,33 @@ app.post("/webhook", function (req, res) {
 });
 
 function processPostback(event) {
-  var senderId = event.sender.id;
-  var payload = event.postback.payload;
+  const senderId = event.sender.id;
+  const payload = event.postback.payload;
 
-  if (payload === "Greeting") {
+  if (payload === 'Greeting') {
     // Get user's first name from the User Profile API
     // and include it in the greeting
     request({
-      url: "https://graph.facebook.com/v2.6/" + senderId,
+      url: `https://graph.facebook.com/v2.6/${senderId}`,
       qs: {
         access_token: process.env.PAGE_ACCESS_TOKEN,
-        fields: "first_name"
+        fields: 'first_name'
       },
-      method: "GET"
-    }, function(error, response, body) {
-      var greeting = "";
+      method: 'GET'
+    }, (error, response, body) => {
+      let greeting = "";
+
       if (error) {
-        console.log("Error getting user's name: " +  error);
+        console.log(`Error getting user's name: ${error}`);
       } else {
-        var bodyObj = JSON.parse(body);
-        name = bodyObj.first_name;
-        greeting = "Hi " + name + ". ";
+        const bodyObj = JSON.parse(body);
+
+        greeting = `Hi ${bodyObj.first_name}.`;
       }
-      var message = greeting + "I am Inclusy, your intelligent loan officer bot. I can help you with loan and mortgage-related matters.";
-      sendMessage(senderId, {text: message});
+      
+      greeting = `${greeting} I am Inclusy, your intelligent loan officer bot. I can help you with loan and mortgage-related matters.`;
+
+      sendMessage(senderId, {text: greeting});
     });
   }
 }
@@ -92,54 +100,74 @@ function processPostback(event) {
 // sends message to user
 function sendMessage(recipientId, message) {
   request({
-    url: "https://graph.facebook.com/v2.6/me/messages",
+    url: 'https://graph.facebook.com/v2.6/me/messages',
     qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
-    method: "POST",
+    method: 'POST',
     json: {
       recipient: {id: recipientId},
       message: message
     }
-  }, function(error, response, body) {
+  }, (error, response, body) => {
     if (error) {
-      console.log("Error sending message: " + response.error);
+      console.log(`Error sending message: ${response.error}`);
     }
   });
 }
 
 function processMessage(event) {
   if (!event.message.is_echo) {
-    var message = event.message;
-    var senderId = event.sender.id;
+    const message = event.message;
+    const senderId = event.sender.id;
 
-    console.log("Received message from senderId: " + senderId);
-    console.log("Message is: " + JSON.stringify(message));
+    console.log(`Received message from senderId: ${senderId}`);
+    console.log(`Message is: ${JSON.stringify(message)}`);
 
     if (message.text) {
       let text;
-      var formattedMsg = message.text.toLowerCase().trim();
+
+      const formattedMsg = message.text.toLowerCase().trim();
+
       if (steps.length) {
-        let len = steps.length
+        let len = steps.length;
+
         if (len === 2) {
-          text = isNaN(Number(formattedMsg)) ? 'I need to know how much you need.' : 'Got it! For further information, please proceeded to your local branch.'
+          text = isNaN(Number(formattedMsg)) ?
+              'I need to know how much you need.' :
+              'Got it! For further information, please proceeded to your local branch.';
         }
         else if (len === 1) {
           if (formattedMsg.includes('yes')) {
-            text = 'May I ask how much'
-            steps.push(true)
+            text = 'May I ask how much';
+
+            steps.push(true);
           }
           else {
-            text = "I'm sorry, but I can only assist you with loan-related matters."
+            text = "I'm sorry, but I can only assist you with loan-related matters.";
           }
         }
       }
-      else if (formattedMsg.includes('loan') || formattedMsg.includes('mortgage') || formattedMsg.includes('borrow') || formattedMsg.includes('business') || formattedMsg.includes('peso')) {
-        text = "May I clarify that you're asking for a loan? Please reply 'Yes' to proceed."
+      else if (hasKeyword(formattedMsg)) {
+        text = "May I clarify that you're asking for a loan? Please reply 'Yes' to proceed.";
+
         steps.push(true);
-      }  else {
-        text = "I don't understand what you said."
       }
+      else {
+        text = "I don't understand what you said.";
+      }
+
       sendMessage(senderId, {text})
     }
   }
 }
 
+function hasKeyword(message) {
+    const keywords = [
+        'loan',
+        'mortgage',
+        'borrow',
+        'business',
+        'peso'
+    ];
+
+    return keywords.some(keyword => message.includes(keyword));
+}
