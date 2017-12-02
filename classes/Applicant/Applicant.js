@@ -16,10 +16,20 @@ class Applicant {
     }
 
     setAge(age) {
+        const isAgeValid = isNaN(age) || age % 1 !== 0 || age < 1;
+
+        if (!isAgeValid) {
+            throw new Error('Invalid age!')
+        }
+
         this.age = age;
     }
 
-    set(hasFamily) {
+    setFamily(hasFamily) {
+        if (typeof hasFamily !== 'boolean') {
+            throw new Error('hasFamily must be boolean!');
+        }
+
         this.hasFamily = hasFamily;
     }
 
