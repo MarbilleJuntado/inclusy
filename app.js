@@ -104,7 +104,7 @@ function processMessage(event) {
     if (message.text) {
       var formattedMsg = message.text.toLowerCase().trim();
 
-      if (steps.length === 0 && formattedMsg.includes('loan') || formattedMsg.includes('mortgage') || formattedMsg.includes('borrow') || formattedMsg.includes('business') || formattedMsg.includes('peso')) {
+      if (steps.length === 0 && hasKeyword(formattedMsg)) {
         sendMessage(senderId, {text: "May I clarify that you're asking for a loan? Please reply 'Yes' or 'No'."}, true);
         steps.push(true);
       } else if (steps[0] === true) {
@@ -124,4 +124,16 @@ function processMessage(event) {
       }
     }
   }
+}
+
+function hasKeyword(message) {
+    const keywords = [
+        'loan',
+        'mortgage',
+        'borrow',
+        'business',
+        'peso'
+    ];
+
+    return keywords.some(keyword => message.includes(keyword));
 }
