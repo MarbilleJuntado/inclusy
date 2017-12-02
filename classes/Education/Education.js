@@ -1,5 +1,6 @@
 const EducationTypes = require('./EducationTypes');
-const EducationType = EducationTypes.EducationType;
+
+const EducationType = EducationTypes.CLASS;
 
 class Education {
     constructor(educationType) {

@@ -1,6 +1,6 @@
 const EmploymentTypes = require('./EmploymentTypes');
 
-const EmploymentType = EmploymentTypes.EmploymentType;
+const EmploymentType = EmploymentTypes.CLASS;
 
 class Employment {
     constructor(employmentType) {

@@ -8,7 +8,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
 
-const User = require('./classes/User/User');
+const Applicant = require('./classes/Applicant/Applicant').default;
 
 let steps = [];
 
@@ -24,9 +24,9 @@ app.post("/user_info", function (req, res) {
     res.send("User needs an id");
   }
   else {
-    const user = new User(id);
+    const user = new Applicant(id);
 
-    res.sendStatus(user)
+    res.sendStatus(200);
   }
 });
 
