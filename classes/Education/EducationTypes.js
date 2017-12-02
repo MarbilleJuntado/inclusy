@@ -9,9 +9,8 @@ const HIGH_SCHOOL = new EducationType('HIGH_SCHOOL', 20);
 const COLLEGE = new EducationType('COLLEGE', 20);
 const NONE = new EducationType('NONE', 0);
 
-exports.EducationType = EducationType;
-
-exports.default = {
+module.exports = {
+    CLASS: EducationType,
     HIGH_SCHOOL,
     COLLEGE,
     NONE

@@ -1,28 +1,72 @@
-const Employment = require('../Employment/Employment');
-const Education = require('../Education/Education');
+const moment = require('moment');
+
+const Employment = require('../Employment/Employment').default;
+const Education = require('../Education/Education').default;
+
+const EmploymentTypes = require('../Employment/EmploymentTypes');
+const EducationTypes = require('../Education/EducationTypes');
 
 class Applicant {
-    employment;
-    education;
-    age;
-    hasFamily;
+    constructor(id,
+                userProfileCreationDate = null,
+                background = {} ) {
+        this.id = id;
+
+        const randYear = Math.floor(Math.random()*13) + 1;
+        this.userProfileCreationDate = userProfileCreationDate ?
+            userProfileCreationDate :
+            moment().subtract(randYear,'years');
+
+        this.background = {
+            employment: null,
+            education: null,
+            age: null,
+            hasFamily: null
+        };
+    }
+
+    createRandomBackground() {
+        // randomized user background for testing
+
+        const empTypeArray = [
+            EmploymentTypes.EMPLOYEE,
+            EmploymentTypes.MARKET_VENDOR,
+            EmploymentTypes.SARI_SARI_VENDOR,
+            EmploymentTypes.OTHER_MICRO_VENDOR,
+            EmploymentTypes.UNEMPLOYED
+        ];
+        const randEmp = Math.floor(Math.random()*5);
+        this.setEmployment(empTypeArray[randEmp]);
+
+        const educTypeArray = [
+            EducationTypes.HIGH_SCHOOL,
+            EducationTypes.COLLEGE,
+            EducationTypes.NONE
+        ];
+        const randEduc = Math.floor(Math.random()*3);
+        this.setEducation(educTypeArray[randEduc]);
+
+        const bool = Math.floor(Math.random()*2) === 0;
+        this.setAge(bool ? 26 : 24);
+        this.setFamily(bool);
+    }
 
     setEmployment(employmentType) {
-        this.employment = new Employment(employmentType);
+        this.background.employment = new Employment(employmentType);
     }
 
     setEducation(educationType) {
-        this.education = new Education(educationType);
+        this.background.education = new Education(educationType);
     }
 
     setAge(age) {
-        const isAgeValid = isNaN(age) || age % 1 !== 0 || age < 1;
+        const isAgeValid = !isNaN(age) || age % 1 === 0 || age > 0;
 
         if (!isAgeValid) {
             throw new Error('Invalid age!')
         }
 
-        this.age = age;
+        this.background.age = age;
     }
 
     setFamily(hasFamily) {
@@ -30,19 +74,24 @@ class Applicant {
             throw new Error('hasFamily must be boolean!');
         }
 
-        this.hasFamily = hasFamily;
+        this.background.hasFamily = hasFamily;
     }
 
     getCreditScore() {
-        let creditScore = 0;
+        const {
+            employment,
+            education,
+            age,
+            hasFamily
+        } = this.background; 
+        
+        let creditScore = employment.getScore() + education.getScore();
 
-        creditScore = creditScore + this.employment.getScore() + this.education.getScore();
-
-        if (this.age >= 25) {
+        if (age >= 25) {
             creditScore += 20;
         }
 
-        if (this.hasFamily) {
+        if (hasFamily) {
             creditScore += 20;
         }
 
