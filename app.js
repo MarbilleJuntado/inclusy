@@ -96,7 +96,7 @@ function sendMessage(recipientId, message) {
 function processMessage(event) {
   if (!event.message.is_echo) {
     var message = event.message;
-    var senderId = event.sender.id; formatedMsg.includes('')
+    var senderId = event.sender.id;
 
     console.log("Received message from senderId: " + senderId);
     console.log("Message is: " + JSON.stringify(message));
