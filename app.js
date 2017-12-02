@@ -8,11 +8,26 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.listen((process.env.PORT || 5000));
 
+const User = require('./classes/User/User');
+
 let steps = [];
 
 // Server index page
 app.get('/', (req, res) => {
   res.send("Deployed!");
+});
+
+app.post("/user_info", function (req, res) {
+  console.log('test');
+
+  if (!req.body.id) {
+    res.send("User needs an id");
+  }
+  else {
+    const user = new User(id);
+
+    res.sendStatus(user)
+  }
 });
 
 // Facebook Webhook
@@ -108,29 +123,39 @@ function processMessage(event) {
     console.log(`Message is: ${JSON.stringify(message)}`);
 
     if (message.text) {
+      let text;
+
       const formattedMsg = message.text.toLowerCase().trim();
 
-      if (steps.length === 0 && hasKeyword(formattedMsg)) {
-        sendMessage(senderId, {text: "May I clarify that you're asking for a loan? Please reply 'Yes' or 'No'."}, true);
+      if (steps.length) {
+        let len = steps.length;
 
-        steps.push(true);
-      } else if (steps[0] === true) {
+        if (len === 2) {
+          text = isNaN(Number(formattedMsg)) ?
+              'I need to know how much you need.' :
+              'Got it! For further information, please proceeded to your local branch.';
+        }
+        else if (len === 1) {
           if (formattedMsg.includes('yes')) {
-            sendMessage(senderId, {text: "May I ask how much?"});
+            text = 'May I ask how much';
 
             steps.push(true);
-          } else {
-            steps.push(false);
           }
-      } else {
-        if (steps[1] === true) {
-          sendMessage(senderId, {text: "Got it! For further information, please proceeded to your local branch."});
-        } else {
-          sendMessage(senderId, {text: "I'm sorry, but I can only assist you with loan-related matters."});
+          else {
+            text = "I'm sorry, but I can only assist you with loan-related matters.";
+          }
         }
-
-        sendMessage(senderId, {text: "Thank you and have a nice day."});
       }
+      else if (hasKeyword(formattedMsg)) {
+        text = "May I clarify that you're asking for a loan? Please reply 'Yes' to proceed.";
+
+        steps.push(true);
+      }
+      else {
+        text = "I don't understand what you said.";
+      }
+
+      sendMessage(senderId, {text})
     }
   }
 }

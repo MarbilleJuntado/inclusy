@@ -50,4 +50,4 @@ class Applicant {
     }
 }
 
-exports = Applicant;
+exports.default = Applicant;
