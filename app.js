@@ -11,7 +11,6 @@ app.listen((process.env.PORT || 5000));
 const Applicant = require('./classes/Applicant/Applicant').default;
 
 let steps = [];
-let user = {};
 
 // Server index page
 app.get('/', (req, res) => {
@@ -54,8 +53,6 @@ app.post('/webhook', (req, res) => {
     req.body.entry.forEach(entry => {
       // Iterate over each messaging event
       entry.messaging.forEach(event => {
-        console.log(steps.length)
-        console.log(event)
         if (event.postback) {
           processPostback(event);
         } else if (event.message) {
@@ -94,9 +91,6 @@ function processPostback(event) {
       }
       
       greeting = `${greeting} I am Inclusy, your intelligent loan officer bot. I can help you with loan and mortgage-related matters.`;
-      // user = new Applicant(senderId);
-      // user.createRandomBackground();
-      // console.log(user);
 
       sendMessage(senderId, {text: greeting});
     });
@@ -121,17 +115,15 @@ function sendMessage(recipientId, message) {
 }
 
 function processMessage(event) {
-  const senderId = event.sender.id;
-
   if (!event.message.is_echo) {
     const message = event.message;
-    let text;
+    const senderId = event.sender.id;
 
     console.log(`Received message from senderId: ${senderId}`);
     console.log(`Message is: ${JSON.stringify(message)}`);
 
     if (message.text) {
-
+      let text;
 
       const formattedMsg = message.text.toLowerCase().trim();
 
@@ -145,15 +137,8 @@ function processMessage(event) {
         }
         else if (len === 1) {
           if (formattedMsg.includes('yes')) {
-            sendMessage(senderId, {text: 'Please wait while we determine your Inclusy score.'})
-            let creditScore = user.getCreditScore()
-            if (creditScore > 60) {
-              loanable = user.getMaxLoanableAmount(creditScore)
-              text = `Based from our records, you are eligible for a ${loanable} loan.`
-            }
-            else {
-              text = 'Based from our records, you are ineligible for a loan.'
-            }
+            text = 'May I ask how much';
+
             steps.push(true);
           }
           else {
