@@ -1,9 +1,13 @@
 class User {
-  user_profile_creation_date;
-  user_profile_id;
-  user_background;
-  constructor(id) {
+
+  constructor(id, 
+    user_profile_creation_date = null,
+    user_profile_id = null,
+    user_background = {} ) {
     this.id = id;
+    this.user_profile_creation_date
+    this.user_profile_id
+    this.user_background
   }
   create () {
     let rand_year = Math.floor(Math.random()*13) + 1;
