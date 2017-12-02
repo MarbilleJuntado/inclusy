@@ -104,13 +104,13 @@ function processMessage(event) {
             var formattedMsg = message.text.toLowerCase().trim();
 
             while (formattedMsg !== 'exit') {
-                if (formattedMsg.contains('loan') || formattedMsg.contains('mortgage') || formattedMsg.contains('borrow') || formattedMsg.contains('business') || formattedMsg.contains('peso')) {
+                if (formattedMsg.includes('loan') || formattedMsg.includes('mortgage') || formattedMsg.includes('borrow') || formattedMsg.includes('business') || formattedMsg.includes('peso')) {
                     sendMessage(userId, {text: "May I clarify that you're asking for a loan? Please reply 'Yes' or 'No"});
-                    if (formattedMsg.contains('yes')) {
+                    if (formattedMsg.includes('yes')) {
                         sendMessage(userId, {text: "May I ask how much?"});
-                    } else if (formattedMsg.contains('no')) {
+                    } else if (formattedMsg.includes('no')) {
                         sendMessage(userId, {text: "Is there anything else I can help you with?"});
-                        if (formattedMsg.contains('no')) {
+                        if (formattedMsg.includes('no')) {
                             sendMessage(userId, {text: "Thank you and have a nice day."});
                         }
                     } else {
