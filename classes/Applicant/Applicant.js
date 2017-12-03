@@ -8,8 +8,8 @@ const EducationTypes = require('../Education/EducationTypes');
 
 class Applicant {
     constructor(id,
-                userProfileCreationDate = null,
-                background = {} ) {
+        userProfileCreationDate = null,
+        background = {} ) {
         this.id = id;
 
         const randYear = Math.floor(Math.random()*13) + 1;
