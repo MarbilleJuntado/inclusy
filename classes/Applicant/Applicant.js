@@ -94,7 +94,6 @@ class Applicant {
         if (hasFamily) {
             creditScore += 20;
         }
-
         return creditScore;
     }
 
