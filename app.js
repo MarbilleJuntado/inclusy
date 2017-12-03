@@ -144,7 +144,7 @@ function processMessage(event) {
             let creditScore = user.getCreditScore()
             if (creditScore > 60) {
               let loanable = user.getMaxLoanableAmount(creditScore)
-              text = `Based from our records, you are eligible for a ${loanable} loan.`
+              text = `Based from our records, you are eligible for a ${loanable} loan. Proceed to your local bank for more information.`
             }
             else {
               text = 'Based from our records, you are ineligible for a loan.'
@@ -153,12 +153,16 @@ function processMessage(event) {
           }
           else {
             text = "I'm sorry, but I can only assist you with loan-related matters.";
+            steps.push(false);
           }
         }
+      } 
+      else if (len === 2) {
+        sendMessage(senderId, {text: 'Thank you and have a nice day.'});
+        steps.push(true);
       }
       else if (hasKeyword(formattedMsg)) {
         text = "May I clarify that you're asking for a loan? Please reply 'Yes' to proceed.";
-
         steps.push(true);
       }
       else {
